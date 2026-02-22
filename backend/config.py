@@ -8,7 +8,7 @@ load_dotenv()
 # LLM model configurations
 FAISS_DB_PATH = "faiss_index"
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
-LLM_MODEL = "llama3-8b-8192" # Groq lightning fast model
+LLM_MODEL = "llama-3.1-8b-instant" # Latest Groq lightning fast model
 EMBEDDING_MODEL = "all-MiniLM-L6-v2" # Free local lightweight model
 
 # RAG tuning parameters
