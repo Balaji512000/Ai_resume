@@ -50,8 +50,10 @@ def main():
 
     # Sidebar for File Uploads
     with st.sidebar:
-        # Secret Admin toggle (In a real app, this would be a password protected route)
-        admin_mode = st.toggle("Admin Mode (Owner Only)", value=True)
+        # Secret Admin Password
+        st.subheader("Admin Access")
+        admin_password = st.text_input("Enter Password to Manage:", type="password", help="Password is 'admin123'")
+        admin_mode = (admin_password == "admin123")
         
         if admin_mode:
             st.header("Admin: Resume Management")
