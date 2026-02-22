@@ -10,7 +10,7 @@ from langchain_core.globals import set_llm_cache
 from langchain_community.cache import SQLiteCache
 
 # Import modular components
-from backend.config import FAISS_DB_PATH
+from backend.config import FAISS_DB_PATH, ADMIN_PASSWORD
 from backend.core.database import VectorDBManager
 from backend.core.agent import RAGPipeline
 from backend.exceptions.custom_exceptions import UnsupportedFileFormatError, EmptyResumeError, VectorDatabaseError
@@ -52,8 +52,8 @@ def main():
     with st.sidebar:
         # Secret Admin Password
         st.subheader("Admin Access")
-        admin_password = st.text_input("Enter Password to Manage:", type="password", help="Password is 'admin123'")
-        admin_mode = (admin_password == "admin123")
+        admin_password = st.text_input("Enter Password to Manage:", type="password")
+        admin_mode = (admin_password == ADMIN_PASSWORD)
         
         if admin_mode:
             st.header("Admin: Resume Management")

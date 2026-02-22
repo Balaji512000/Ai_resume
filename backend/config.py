@@ -11,6 +11,9 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 LLM_MODEL = "llama-3.1-8b-instant" # Latest Groq lightning fast model
 EMBEDDING_MODEL = "all-MiniLM-L6-v2" # Free local lightweight model
 
+# Security
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "owner_secret_key5120")
+
 # RAG tuning parameters
 CHUNK_SIZE = 600
 CHUNK_OVERLAP = 100
