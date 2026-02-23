@@ -1,10 +1,13 @@
 """RAG Pipeline module for querying the vector database."""
+import os
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
-from backend.config import LLM_MODEL, RETRIEVAL_K, HR_SYSTEM_PROMPT, LLM_TEMPERATURE, GROQ_API_KEY
+from backend.config import LLM_MODEL, RETRIEVAL_K, HR_SYSTEM_PROMPT, LLM_TEMPERATURE, GROQ_API_KEY, PROJECT_ROOT
 from backend.core.database import VectorDBManager
+
+RESUME_START_FILE = os.path.join(PROJECT_ROOT, "resume_start.txt")
 
 class RAGPipeline:
     """Main RAG logic wrapper."""
@@ -22,7 +25,7 @@ class RAGPipeline:
         context_texts = "\n\n".join([doc.page_content for doc in docs])
 
         try:
-            with open("resume_start.txt", "r", encoding="utf-8") as f:
+            with open(RESUME_START_FILE, "r", encoding="utf-8") as f:
                 start_text = f.read()
             context_texts = f"[Start of Resume]\n{start_text}\n[End of Start]\n\n[Relevant Matches]\n{context_texts}"
         except Exception:

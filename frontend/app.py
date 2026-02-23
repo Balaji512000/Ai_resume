@@ -15,6 +15,7 @@ from backend.core.database import VectorDBManager
 from backend.core.agent import RAGPipeline
 from backend.exceptions.custom_exceptions import UnsupportedFileFormatError, EmptyResumeError, VectorDatabaseError
 from backend.utils.cache_manager import ResponseCache
+from backend.utils.query_logger import QueryLogger
 
 # Enable sqlite caching (Langchain level)
 set_llm_cache(SQLiteCache(database_path="llm_cache.db"))
@@ -76,6 +77,23 @@ def main():
                 VectorDBManager.delete_db()
                 st.session_state["messages"] = []
                 st.success("Current Resume (and memory) completely purged.")
+
+            st.divider()
+            st.subheader("📋 Query Logs (Friends Questions)")
+            all_logs = QueryLogger.get_all()
+            if all_logs:
+                st.success(f"Total questions asked: {len(all_logs)}")
+                for i, log in enumerate(reversed(all_logs), 1):
+                    with st.expander(f"[{log['timestamp']}] {log['question'][:60]}..."):
+                        st.markdown(f"**❓ Question:** {log['question']}")
+                        st.markdown(f"**💬 Answer:** {log['answer']}")
+                        st.markdown(f"**⚡ Source:** {log['source']}")
+                if st.button("🗑️ Clear All Logs (Admin)"):
+                    QueryLogger.clear()
+                    st.success("All logs cleared!")
+                    st.rerun()
+            else:
+                st.info("No questions logged yet.")
         else:
             st.info("Upload functionality is disabled for viewers. Switch to Admin mode to manage resumes.")
 
@@ -126,6 +144,7 @@ def main():
                         full_response = cached_response
                         source_text = "Retrieved instantly from fast cache ⚡"
                         message_placeholder.markdown(full_response)
+                        QueryLogger.log(user_query, full_response.strip(), source="cache")
                     else:
                         streamer, docs = RAGPipeline.answer_query(user_query)
                         
@@ -148,6 +167,7 @@ def main():
                         # Save successful answers to fast cache
                         if full_response and "Failed to connect" not in full_response:
                             ResponseCache.set(user_query, full_response.strip())
+                            QueryLogger.log(user_query, full_response.strip(), source="live")
                             
                 except Exception as e:
                     full_response = f"Failed to connect to backend AI/Ollama. Please ensure Ollama is running. Error: {str(e)}"

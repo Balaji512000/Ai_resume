@@ -5,10 +5,12 @@ import tempfile
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from backend.config import FAISS_DB_PATH, EMBEDDING_MODEL, CHUNK_SIZE, CHUNK_OVERLAP
+from backend.config import FAISS_DB_PATH, EMBEDDING_MODEL, CHUNK_SIZE, CHUNK_OVERLAP, PROJECT_ROOT
 from backend.utils.parsers import extract_text_from_pdf, extract_text_from_docx
 from backend.exceptions.custom_exceptions import UnsupportedFileFormatError, EmptyResumeError, VectorDatabaseError
 from backend.utils.cache_manager import ResponseCache
+
+RESUME_START_FILE = os.path.join(PROJECT_ROOT, "resume_start.txt")
 
 class VectorDBManager:
     """Wrapper class for FAISS operations."""
@@ -36,7 +38,7 @@ class VectorDBManager:
             VectorDBManager.delete_db()
 
             # Save the first 1000 characters to ensure Name/Contact info is never missed by vector search
-            with open("resume_start.txt", "w", encoding="utf-8") as f:
+            with open(RESUME_START_FILE, "w", encoding="utf-8") as f:
                 f.write(text[:1000])
 
             text_splitter = RecursiveCharacterTextSplitter(chunk_size=CHUNK_SIZE, chunk_overlap=CHUNK_OVERLAP)
@@ -60,8 +62,8 @@ class VectorDBManager:
         """Wipes the FAISS index directory and clears cache."""
         if os.path.exists(FAISS_DB_PATH):
             shutil.rmtree(FAISS_DB_PATH)
-        if os.path.exists("resume_start.txt"):
-            os.remove("resume_start.txt")
+        if os.path.exists(RESUME_START_FILE):
+            os.remove(RESUME_START_FILE)
         ResponseCache.clear()
 
     @staticmethod

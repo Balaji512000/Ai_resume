@@ -5,8 +5,11 @@ from dotenv import load_dotenv
 # Load local .env if available
 load_dotenv()
 
+# Project root — always correct regardless of where Streamlit runs from
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+
 # LLM model configurations
-FAISS_DB_PATH = "faiss_index"
+FAISS_DB_PATH = os.path.join(PROJECT_ROOT, "faiss_index")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 LLM_MODEL = "llama-3.1-8b-instant" # Latest Groq lightning fast model
 EMBEDDING_MODEL = "all-MiniLM-L6-v2" # Free local lightweight model
